@@ -253,7 +253,7 @@ public class Animatedballframe : Form
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on top wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
-      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth-horizontaladjustment) //Ball b has collided with the right wall
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball b has collided with the right wall /////// was formwidth - horizontaladjustment
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on right wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
