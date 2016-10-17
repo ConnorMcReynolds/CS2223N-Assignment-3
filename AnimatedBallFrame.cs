@@ -31,14 +31,15 @@ using System.Timers;
 
 public class Animatedballframe : Form
 {  private const int formwidth = 1920;
-   private const int formheight = 1080; 
+   private const int formheight = 1080;
+
+//Panel Gpanel = new Panel();
    
    Label title_label = new Label();
    Label x_label = new Label();
    Label y_label = new Label();
    TextBox user_degreesTB = new TextBox();
    
-   Label NOTE = new Label();
    
    private Button exit_button = new Button();
    private Point exit_button_location = new Point(1720,930);
@@ -56,7 +57,7 @@ public class Animatedballframe : Form
    //motion and more jerkiness.  A smaller number means less speed but smooth motion.
    
    //distance the ball moves every refresh (ms). Distance = Pixels
-   private const double ball_a_distance_moved_per_refresh = 0.5;  //The unit of measure is 1 pixel.
+   private const double ball_a_distance_moved_per_refresh = 2.0;  //The unit of measure is 1 pixel.
   
    
    //Declaring used variables for Ball A
@@ -107,13 +108,6 @@ public class Animatedballframe : Form
    start_stop_button.Location = start_stop_button_location;
    start_stop_button.BackColor = Color.LightGreen;
    start_stop_button.Font = new Font("Georgia", 18);
-   
-   NOTE.Location = new Point(0,50);
-   NOTE.Size = new Size(1920, 20);
-   NOTE.BackColor = Color.Beige;
-   NOTE.ForeColor = Color.Black;
-   NOTE.Font = new Font("Georgia", 14);
-   NOTE.Text = "To save you time grading this I may as well let you know entering degrees doesn't work, start/stop button doesn't work";
       
    x_label.Location = new Point(820, 930);
    x_label.Size = new Size(200,66);
@@ -140,6 +134,8 @@ public class Animatedballframe : Form
    title_label.BorderStyle = BorderStyle.FixedSingle;
    title_label.Font = new Font("Georgia", 18);
    title_label.Text = "Animation by Connor McReynolds";
+
+  // CreateGpanel(Gpanel);
    
        
       //Set the initial coordinates of ball a.
@@ -165,7 +161,7 @@ public class Animatedballframe : Form
       //The next statement tells the clock what method to perform each time the clock makes a tick.
       ball_a_control_clock.Elapsed += new ElapsedEventHandler(Updateballa);
 
-    
+     // Controls.Add(Gpanel);
     //  Controls.Add(ControlPanel);
       Controls.Add(title_label);
       Controls.Add(x_label);
@@ -173,7 +169,6 @@ public class Animatedballframe : Form
       Controls.Add(exit_button);
       Controls.Add(start_stop_button);
       Controls.Add(user_degreesTB);
-      Controls.Add(NOTE);
 
       Startgraphicclock(graphicrefreshrate);  //refreshrate is how many times per second the display area is re-painted.
       if (start_stop_clicked = true) {
@@ -192,6 +187,14 @@ public class Animatedballframe : Form
       //In fact, it calls the method with the same name located in the super class.
       base.OnPaint(ee);
    }
+
+  /* protected void CreateGpanel(Panel P)
+{
+       P.Location = new Point(0,50);
+P.Size = new Size(1920, 830);
+P.BackColor = Color.Blue;
+}
+*/
    
 
    protected void Startgraphicclock(double refreshrate)
@@ -249,15 +252,15 @@ public class Animatedballframe : Form
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on left wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
-      else if(ball_a_int_coord_y<=0) //Ball b has collided with the top wall
+      else if(ball_a_int_coord_y<=50) //Ball b has collided with the top wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on top wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
-      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball b has collided with the right wall /////// was formwidth - horizontaladjustment
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball b has collided with the right wall
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on right wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
-      else if(ball_a_int_coord_y+2*ball_a_radius+2*ball_a_radius>=formheight) //Ball b has collided with the lower wall
+      else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball b has collided with the lower wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at the time of impact on lower wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
          }
@@ -275,5 +278,4 @@ public class Animatedballframe : Form
    }
 
 }//End of class Animatedballframe
-
 
