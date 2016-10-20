@@ -2,17 +2,17 @@
 //Author: Connor McReynolds
 //Author's email: cmcreynolds@scu.fullerton.edu
 //Course: CPSC223N
-//Assignment number: 2
-//Due date: 10/2/2017 (mm/dd/yyyy)
-//Date last updated: 10/2/2017 (mm/dd/yyyy)
+//Assignment number: 3
+//Due date: 10/22/2016 (mm/dd/yyyy)
+//Date last updated: 10/22/2016 (mm/dd/yyyy)
 //Source files in this program: AnimatedBallFrame.cs, AnimatedBallLogic.cs, AnimatedBallMain.cs
-//Purpose of this entire program: Create and control an animated ball
+//Purpose of this entire program: Create and control an animated ball with collision detection
 //Development status: Almost complete, runs
-//Development platform: Bash using Mono on Xubuntu
+//Development platform: Bash using Mono on ubuntu
 //Safe software seal of approval: No Microsoft products were used in the construction of this program.
 
 //Name of this file: AnimatedBallFrame
-//Purpose of this file: Show the graphical area. Show the ball moving in a direction at a specific speed
+//Purpose of this file: Show the graphical area. Handles most functions
 
 
 
@@ -32,24 +32,22 @@ using System.Timers;
 public class Animatedballframe : Form
 {  private const int formwidth = 1920;
    private const int formheight = 1080;
-
-//Panel Gpanel = new Panel();
    
+   // Textbox and Labels
    Label title_label = new Label();
    Label x_label = new Label();
    Label y_label = new Label();
+   Label wall_collisions = new Label();
    TextBox user_degreesTB = new TextBox();
    
-   
+   // Buttons
    private Button exit_button = new Button();
    private Point exit_button_location = new Point(1720,930);
    private Button start_stop_button = new Button();
    private Point start_stop_button_location = new Point(1470, 930);
    
- 
-//   Panel ControlPanel = new Panel()
    
-   //These radiuses are used as a referenece for the real radiuses of the balls
+   //These radiuses are used as a referenece for the real radius of the ball
    private const int ball_a_radius = 16;
    
    
@@ -63,14 +61,24 @@ public class Animatedballframe : Form
    //Declaring used variables for Ball A
    private double ball_a_real_coord_x = (double)(formwidth/2 - ball_a_radius);
    private double ball_a_real_coord_y = (double)(formheight/2 - ball_a_radius);
+   private double collision_ball_real_coord_x = (double)500;
+   private double collision_ball_real_coord_y = (double)500;
    //We do all our math with doubles, then at the end convert to integers
    private int ball_a_int_coord_x;  //The x-coordinate of ball a.
    private int ball_a_int_coord_y;  //The y-coordinate of ball a.
-   private double ball_a_horizontal_delta;
+    private double ball_a_horizontal_delta;
    private double ball_a_vertical_delta;
    private double ball_a_angle_radians;
+   
+   // collision ball points
+   private int collision_ball_int_coord_x;
+   private int collision_ball_int_coord_y;
+   
+  
    private bool start_stop_clicked = false;
    
+   // counter for wall collisions
+   private int wallCollisions = 0;
    
    //Clock declarations. 30.0 Hz = constant refresh rate during the execution of this animated program.
    private const double graphicrefreshrate = 60.0;
@@ -81,7 +89,8 @@ public class Animatedballframe : Form
    
    public Animatedballframe()   //The constructor of this class
    { 
-		
+	   
+		//creates smooth animation
 		DoubleBuffered  = true;
    
       Text = "Animated Ball";
@@ -89,6 +98,13 @@ public class Animatedballframe : Form
       //Set the initial size of this form
       Size = new Size(formwidth,formheight);
       BackColor = Color.Green;
+   
+   wall_collisions.Location = new Point(300,930);
+   wall_collisions.Size = new Size(200,66);
+   wall_collisions.BackColor = Color.White;
+   wall_collisions.ForeColor = Color.Black;
+   wall_collisions.Font = new Font("georgia", 18);
+ //  wall_collisions.Text = Countwallcollisions(wallCollisions).ToString();
    
    user_degreesTB.Text = "Enter degrees: ";
    user_degreesTB.Size = new Size(200,66);
@@ -134,15 +150,20 @@ public class Animatedballframe : Form
    title_label.BorderStyle = BorderStyle.FixedSingle;
    title_label.Font = new Font("Georgia", 18);
    title_label.Text = "Animation by Connor McReynolds";
-
-  // CreateGpanel(Gpanel);
    
-       
+   // call function that checks for wall collisions, use created variable wallCollisions
+   Countwallcollisions(wallCollisions);
+   
+   
       //Set the initial coordinates of ball a.
       ball_a_int_coord_x = (int)(ball_a_real_coord_x);
       ball_a_int_coord_y = (int)(ball_a_real_coord_y);
       System.Console.WriteLine("Initial coordinates: ball_a_int_coord_x = {0}. ball_a_int_coord_y = {1}.",
                                ball_a_int_coord_x,ball_a_int_coord_y);
+                               
+      //Set initial coord. of collosion ball
+      collision_ball_int_coord_x = (int) collision_ball_real_coord_x;
+      collision_ball_int_coord_y = (int) collision_ball_real_coord_y;
     
       //Instantiate the collection of supporting algorithms
       Animatedballlogic algorithms = new Animatedballlogic();
@@ -161,14 +182,13 @@ public class Animatedballframe : Form
       //The next statement tells the clock what method to perform each time the clock makes a tick.
       ball_a_control_clock.Elapsed += new ElapsedEventHandler(Updateballa);
 
-     // Controls.Add(Gpanel);
-    //  Controls.Add(ControlPanel);
       Controls.Add(title_label);
       Controls.Add(x_label);
       Controls.Add(y_label);
       Controls.Add(exit_button);
       Controls.Add(start_stop_button);
       Controls.Add(user_degreesTB);
+      Controls.Add(wall_collisions);
 
       Startgraphicclock(graphicrefreshrate);  //refreshrate is how many times per second the display area is re-painted.
       if (start_stop_clicked = true) {
@@ -182,20 +202,12 @@ public class Animatedballframe : Form
    protected override void OnPaint(PaintEventArgs ee)
    {  Graphics graph = ee.Graphics;
       graph.FillEllipse(Brushes.Yellow,ball_a_int_coord_x,ball_a_int_coord_y,2*ball_a_radius,2*ball_a_radius);
+      graph.FillEllipse(Brushes.Red, collision_ball_int_coord_x, collision_ball_int_coord_y, 100, 200);
       graph.FillRectangle(Brushes.LightBlue, new Rectangle(0,880,1920,200));
       //The next statement looks like recursion, but it really is not recursion.
       //In fact, it calls the method with the same name located in the super class.
       base.OnPaint(ee);
    }
-
-  /* protected void CreateGpanel(Panel P)
-{
-       P.Location = new Point(0,50);
-P.Size = new Size(1920, 830);
-P.BackColor = Color.Blue;
-}
-*/
-   
 
    protected void Startgraphicclock(double refreshrate)
    {   double elapsedtimebetweentics;
@@ -218,6 +230,30 @@ P.BackColor = Color.Blue;
    {ball_a_control_clock.Enabled = false;
 	   ball_a_clock_active = false;
    }
+   
+   protected void Countwallcollisions(int collisions)
+   {  collisions = -1;
+	   
+	    if(ball_a_int_coord_x<=0) //Ball a has collided with the left wall
+	    {
+         collisions++;
+         }
+      else if(ball_a_int_coord_y<=50) //Ball a has collided with the top wall
+      {
+         collisions++;
+         }
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball a has collided with the right wall
+      {
+         collisions++;
+         }
+      else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball a has collided with the lower wall
+      {
+        collisions++;
+         }
+         
+	
+	//return collisions;
+}
 
    protected void Updatedisplay(System.Object sender, ElapsedEventArgs evt)
    {  Invalidate();  //Weird: This creates an artificial event so that the graphic area will repaint itself.
@@ -247,22 +283,26 @@ P.BackColor = Color.Blue;
            System.Console.WriteLine("The clock controlling ball a has stopped.");
           }
 		  */
-		  
-		   if(ball_a_int_coord_x<=0) //Ball b has collided with the left wall
+		 
+		   if(ball_a_int_coord_x<=0) //Ball a has collided with the left wall
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on left wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          wall_collisions.Text = wallCollisions.ToString();
          }
-      else if(ball_a_int_coord_y<=50) //Ball b has collided with the top wall
+      else if(ball_a_int_coord_y<=50) //Ball a has collided with the top wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on top wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          wall_collisions.Text = wallCollisions.ToString();
          }
-      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball b has collided with the right wall
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball a has collided with the right wall
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on right wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          wall_collisions.Text = wallCollisions.ToString();
          }
-      else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball b has collided with the lower wall
+      else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball a has collided with the lower wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at the time of impact on lower wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          wall_collisions.Text = wallCollisions.ToString();
          }
 		  
    }//End of method Updateballa

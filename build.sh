@@ -2,11 +2,17 @@
 #In the official documemtation the line above always has to be the first line of any script file.  But, students have 
 #told me that script files work correctly without that first line.
 
-#Author: Michelle Hernandez
-#Course: CPSC223n
-#Semester: Fall 2016
-#Assignment: 1
-#Due: September 10, 2016.
+#Author: Connor McReynolds
+#Author's email: cmcreynolds@scu.fullerton.edu
+#Course: CPSC223N
+#Assignment number: 3
+#Due date: 10/22/2016 (mm/dd/yyyy)
+#Date last updated: 10/22/2016 (mm/dd/yyyy)
+#Source files in this program: AnimatedBallFrame.cs, AnimatedBallLogic.cs, AnimatedBallMain.cs
+#Purpose of this entire program: Create and control an animated ball with collision detection
+#Development status: Almost complete, runs
+#Development platform: Bash using Mono on ubuntu
+#Safe software seal of approval: No Microsoft products were used in the construction of this program.
 
 #This is a bash shell script to be used for compiling, linking, and executing the C sharp files of this assignment.
 #Execute this file by navigating the terminal window to the folder where this file resides, and then enter the command: ./build.sh
@@ -37,7 +43,7 @@ mcs -r:System -r:System.Windows.Forms -r:AnimatedBallFrame.dll -out:Animated_Bal
 echo View the list of files in the current folder
 ls -l
 
-echo Run the Assignment 1 program.
+echo Run the Assignment 3 program.
 ./Animated_Ball.exe
 
 echo The script has terminated.
