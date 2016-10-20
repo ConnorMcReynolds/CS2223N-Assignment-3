@@ -2,13 +2,13 @@
 //Author: Connor McReynolds
 //Author's email: cmcreynolds@scu.fullerton.edu
 //Course: CPSC223N
-//Assignment number: 2
-//Due date: 10/2/2017 (mm/dd/yyyy)
-//Date last updated: 10/2/2017 (mm/dd/yyyy)
+//Assignment number: 3
+//Due date: 10/22/2016 (mm/dd/yyyy)
+//Date last updated: 10/22/2016 (mm/dd/yyyy)
 //Source files in this program: AnimatedBallFrame.cs, AnimatedBallLogic.cs, AnimatedBallMain.cs
-//Purpose of this entire program: Create and control an animated ball
+//Purpose of this entire program: Create and control an animated ball with collision detection
 //Development status: Almost complete, runs
-//Development platform: Bash using Mono on Xubuntu
+//Development platform: Bash using Mono on ubuntu
 //Safe software seal of approval: No Microsoft products were used in the construction of this program.
 
 //Name of this file: AnimatedBallLogic
