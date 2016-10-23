@@ -37,14 +37,15 @@ public class Animatedballframe : Form
    Label title_label = new Label();
    Label x_label = new Label();
    Label y_label = new Label();
+   Label wall_collisions_title = new Label();
    Label wall_collisions = new Label();
    TextBox user_degreesTB = new TextBox();
    
    // Buttons
    private Button exit_button = new Button();
    private Point exit_button_location = new Point(1720,930);
-   private Button start_stop_button = new Button();
-   private Point start_stop_button_location = new Point(1470, 930);
+   private Button start_button = new Button();
+   private Point start_button_location = new Point(1470, 930);
    
    
    //These radiuses are used as a referenece for the real radius of the ball
@@ -61,8 +62,8 @@ public class Animatedballframe : Form
    //Declaring used variables for Ball A
    private double ball_a_real_coord_x = (double)(formwidth/2 - ball_a_radius);
    private double ball_a_real_coord_y = (double)(formheight/2 - ball_a_radius);
-   private double collision_ball_real_coord_x = (double)500;
-   private double collision_ball_real_coord_y = (double)500;
+   private double collision_ball_real_coord_x = (double)1500;
+   private double collision_ball_real_coord_y = (double)400;
    //We do all our math with doubles, then at the end convert to integers
    private int ball_a_int_coord_x;  //The x-coordinate of ball a.
    private int ball_a_int_coord_y;  //The y-coordinate of ball a.
@@ -75,7 +76,7 @@ public class Animatedballframe : Form
    private int collision_ball_int_coord_y;
    
   
-   private bool start_stop_clicked = false;
+   private bool start_clicked = false;
    
    // counter for wall collisions
    private int wallCollisions = 0;
@@ -99,12 +100,19 @@ public class Animatedballframe : Form
       Size = new Size(formwidth,formheight);
       BackColor = Color.Green;
    
-   wall_collisions.Location = new Point(300,930);
-   wall_collisions.Size = new Size(200,66);
+   wall_collisions.Location = new Point(300,963);
+   wall_collisions.Size = new Size(200,33);
    wall_collisions.BackColor = Color.White;
    wall_collisions.ForeColor = Color.Black;
    wall_collisions.Font = new Font("georgia", 18);
- //  wall_collisions.Text = Countwallcollisions(wallCollisions).ToString();
+   wall_collisions.Text = wallCollisions.ToString();
+ 
+   wall_collisions_title.Location = new Point(300,930);
+   wall_collisions_title.Size = new Size(200,33);
+   wall_collisions_title.BackColor = Color.White;
+   wall_collisions_title.ForeColor = Color.Black;
+   wall_collisions_title.Font = new Font("Georgia", 18);
+   wall_collisions_title.Text = "Collision count:";
    
    user_degreesTB.Text = "Enter degrees: ";
    user_degreesTB.Size = new Size(200,66);
@@ -119,11 +127,11 @@ public class Animatedballframe : Form
    exit_button.BackColor = Color.Red;
    exit_button.Font = new Font("Georgia", 18);
    
-   start_stop_button.Text = "Start/Stop";
-   start_stop_button.Size = new Size(200,66);
-   start_stop_button.Location = start_stop_button_location;
-   start_stop_button.BackColor = Color.LightGreen;
-   start_stop_button.Font = new Font("Georgia", 18);
+   start_button.Text = "Start";
+   start_button.Size = new Size(200,66);
+   start_button.Location = start_button_location;
+   start_button.BackColor = Color.LightGreen;
+   start_button.Font = new Font("Georgia", 18);
       
    x_label.Location = new Point(820, 930);
    x_label.Size = new Size(200,66);
@@ -145,14 +153,11 @@ public class Animatedballframe : Form
    title_label.Location = new Point(0,0);
    title_label.Height = 50;
    title_label.Width = 1920;
-   title_label.BackColor = Color.Red;
+   title_label.BackColor = Color.Blue;
    title_label.ForeColor = Color.Black;
    title_label.BorderStyle = BorderStyle.FixedSingle;
    title_label.Font = new Font("Georgia", 18);
    title_label.Text = "Animation by Connor McReynolds";
-   
-   // call function that checks for wall collisions, use created variable wallCollisions
-   Countwallcollisions(wallCollisions);
    
    
       //Set the initial coordinates of ball a.
@@ -186,17 +191,17 @@ public class Animatedballframe : Form
       Controls.Add(x_label);
       Controls.Add(y_label);
       Controls.Add(exit_button);
-      Controls.Add(start_stop_button);
+      Controls.Add(start_button);
       Controls.Add(user_degreesTB);
       Controls.Add(wall_collisions);
+      Controls.Add(wall_collisions_title);
 
       Startgraphicclock(graphicrefreshrate);  //refreshrate is how many times per second the display area is re-painted.
-      if (start_stop_clicked = true) {
       Startballaclock(ball_a_update_rate);    //Set the animation rate for ball a. /////////////////////////////////////////////////////////////////
-  }
+  
   
       exit_button.Click += new EventHandler(ExitProgram);
-      start_stop_button.Click += new EventHandler(StartStopAnimation);
+      start_button.Click += new EventHandler(StartAnimation);
    }//End of constructor
 
    protected override void OnPaint(PaintEventArgs ee)
@@ -210,20 +215,28 @@ public class Animatedballframe : Form
    }
 
    protected void Startgraphicclock(double refreshrate)
-   {   double elapsedtimebetweentics;
+   {   
+	   if(start_clicked = true)
+	   {
+	   double elapsedtimebetweentics;
        if(refreshrate < 1.0) refreshrate = 1.0;  //Avoid dividing by a number close to zero.
        elapsedtimebetweentics = 1000.0/refreshrate;  //elapsedtimebetweentics has units milliseconds.
        graphic_area_refresh_clock.Interval = (int)System.Math.Round(elapsedtimebetweentics);
        graphic_area_refresh_clock.Enabled = true;  //Start clock ticking.
    }
+   }
 
    protected void Startballaclock(double updaterate)
-   {   double elapsedtimebetweenballmoves;
+   {   
+	   if(start_clicked = true)
+	   {
+	   double elapsedtimebetweenballmoves;
        if(updaterate < 1.0) updaterate = 1.0;  //This program does not allow updates slower than 1 Hz.
        elapsedtimebetweenballmoves = 1000.0/updaterate;  //1000.0ms = 1second.  elapsedtimebetweenballmoves has units milliseconds.
        ball_a_control_clock.Interval = (int)System.Math.Round(elapsedtimebetweenballmoves);
        ball_a_control_clock.Enabled = true;   //Start clock ticking.
        ball_a_clock_active = true;
+   }
    }
    
    protected void Stopballaclock(double updaterate)
@@ -232,23 +245,27 @@ public class Animatedballframe : Form
    }
    
    protected void Countwallcollisions(int collisions)
-   {  collisions = -1;
+   {  collisions = 0;
 	   
 	    if(ball_a_int_coord_x<=0) //Ball a has collided with the left wall
 	    {
          collisions++;
+         wallCollisions++;
          }
       else if(ball_a_int_coord_y<=50) //Ball a has collided with the top wall
       {
          collisions++;
+         wallCollisions++;
          }
-      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball a has collided with the right wall
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth-10) //Ball a has collided with the right wall
       {
          collisions++;
+         wallCollisions++;
          }
       else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball a has collided with the lower wall
       {
         collisions++;
+        wallCollisions++;
          }
          
 	
@@ -257,7 +274,7 @@ public class Animatedballframe : Form
 
    protected void Updatedisplay(System.Object sender, ElapsedEventArgs evt)
    {  Invalidate();  //Weird: This creates an artificial event so that the graphic area will repaint itself.
-      //System.Console.WriteLine("The clock ticked and the time is {0}", evt.SignalTime);  //Debug statement; remove it later.
+      //System.Console.WriteLine("The clock ticked and the time is {0}", evt.SignalTime();  //Debug statement; remove it later.
       if(!(ball_a_clock_active))
           {graphic_area_refresh_clock.Enabled = false;
            System.Console.WriteLine("The graphical area is no longer refreshing.  You may close the window.");
@@ -275,41 +292,45 @@ public class Animatedballframe : Form
       ball_a_int_coord_y = (int)System.Math.Round(ball_a_real_coord_y);
       //System.Console.WriteLine("The clock ticked for ball a and the time is {0}", evt.SignalTime);//Debug statement; remove later.
       
-	  /*
-	  //Determine if ball a has passed beyond the graphic area.
-      if(ball_a_int_coord_x >= formwidth || ball_a_int_coord_y + 2*ball_a_radius <= 0 || ball_a_int_coord_y >= formheight)
-          {ball_a_clock_active = false;
-           ball_a_control_clock.Enabled = false;
-           System.Console.WriteLine("The clock controlling ball a has stopped.");
-          }
-		  */
 		 
 		   if(ball_a_int_coord_x<=0) //Ball a has collided with the left wall
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on left wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          Countwallcollisions(wallCollisions);
           wall_collisions.Text = wallCollisions.ToString();
+           System.Console.WriteLine("Walls collided with " + wallCollisions + " times");
+           System.Console.WriteLine(" ");
          }
       else if(ball_a_int_coord_y<=50) //Ball a has collided with the top wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on top wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          Countwallcollisions(wallCollisions);
           wall_collisions.Text = wallCollisions.ToString();
+          System.Console.WriteLine("Walls collided with " + wallCollisions + " times");
+          System.Console.WriteLine(" ");
          }
-      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth) //Ball a has collided with the right wall
+      else if(ball_a_int_coord_x+2*ball_a_radius>=formwidth-10) //Ball a has collided with the right wall
          {ball_a_horizontal_delta = - ball_a_horizontal_delta;
           System.Console.WriteLine("The coordinates of ball a at time of impact on right wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          Countwallcollisions(wallCollisions);
           wall_collisions.Text = wallCollisions.ToString();
+           System.Console.WriteLine("Walls collided with " + wallCollisions + " times");
+           System.Console.WriteLine(" ");
          }
       else if(ball_a_int_coord_y+2*ball_a_radius>=880) //Ball a has collided with the lower wall
          {ball_a_vertical_delta = - ball_a_vertical_delta;
-          System.Console.WriteLine("The coordinates of ball a at the time of impact on lower wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          System.Console.WriteLine("The coordinates of ball a at time of impact on lower wall are ({0},{1})",ball_a_int_coord_x,ball_a_int_coord_y);//Debug statement
+          Countwallcollisions(wallCollisions);
           wall_collisions.Text = wallCollisions.ToString();
+          System.Console.WriteLine("Walls collided with " + wallCollisions + " times");
+          System.Console.WriteLine(" ");
          }
 		  
    }//End of method Updateballa
 
-   protected void StartStopAnimation(object sender,EventArgs events)
+   protected void StartAnimation(object sender,EventArgs events)
    {
-	  start_stop_clicked = true;
+	  start_clicked = true;
    }
    
    protected void ExitProgram(object sender,EventArgs events)
